@@ -26,10 +26,9 @@ RUN cd nagiosxi \
  && touch installed.firewall
 
 # Disable kernel parameter
-ADD conf/post-install.patch $SRC_DIR/nagiosxi/post-install.patch
-RUN yum install -y patch \
- && cd nagiosxi \
- && patch -p0 < post-install.patch
+
+RUN cp -f mods/cfg/ndomod.cfg /usr/local/nagios/etc
+
 
 # Build
 RUN cd nagiosxi \
@@ -63,6 +62,7 @@ EXPOSE 80 5666 5667
 
 
 CMD ["/start.sh"]
+
 
 
 
