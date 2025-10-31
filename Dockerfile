@@ -3,7 +3,7 @@ FROM centos:7
 # get stuff from the interwebs
 RUN yum -y install wget tar; yum clean all
 RUN mkdir /tmp/nagiosxi \
-    && wget -qO- https://go2.nagios.com/get-xi/source \
+    && wget -qO- https://assets.nagios.com/downloads/nagiosxi/2026/xi-2026R1.tar.gz \
     | tar xz -C /tmp
 WORKDIR /tmp/nagiosxi
 
@@ -73,4 +73,5 @@ EXPOSE 80 5666 5667
 
 
 CMD ["/start.sh"]
+
 
