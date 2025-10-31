@@ -49,7 +49,7 @@ EXPOSE 80 443 5666 5667
 # Supervisor
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.d/supervisord.conf"]
 
-VOLUME "${NAGIOS_HOME}/var" "${NAGIOS_HOME}/etc" "/var/log/apache2" "/opt/Custom-Nagios-Plugins" "/opt/nagiosgraph/var" "/opt/nagiosgraph/etc"
+VOLUME  "/usr/local/nagios/etc" 
 
 COPY update_hosts.sh /usr/local/bin/
 COPY update_ssh.sh /usr/local/bin/
@@ -63,6 +63,7 @@ EXPOSE 80 5666 5667
 
 
 CMD ["/start.sh"]
+
 
 
 
