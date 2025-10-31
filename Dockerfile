@@ -66,6 +66,10 @@ RUN yum clean all
 # set startup script
 ADD start.sh /start.sh
 RUN chmod 755 /start.sh
+RUN echo "Europe/Paris" > /etc/timezone
+RUN echo "alias ssh='ssh -o StrictHostKeyChecking=accept-new'" >> /etc/bash.bashrc
+RUN usermod --shell /bin/bash nagios
 EXPOSE 80 5666 5667
+
 
 CMD ["/start.sh"]
