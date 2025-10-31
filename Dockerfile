@@ -23,7 +23,7 @@ RUN curl -LO "http://assets.nagios.com/downloads/nagiosxi/xi-latest.tar.gz" \
 
 # Disable firewall
 RUN cd nagiosxi \
- && touch installed.firewall
+&& touch installed.firewall
 
 # Disable kernel parameter
 
@@ -31,9 +31,9 @@ RUN cd nagiosxi \
 
 
 # Build
-RUN cd nagiosxi \
- && ./fullinstall -n
-
+#RUN cd nagiosxi \
+ #&& ./fullinstall -n
+RUN ./nagios/fullinstall -n
 # Supervisor
 RUN yum install -y python-setuptools python-meld3 \
  && easy_install pip \
@@ -62,6 +62,7 @@ EXPOSE 80 5666 5667
 
 
 CMD ["/start.sh"]
+
 
 
 
