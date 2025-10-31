@@ -1,68 +1,58 @@
-FROM centos:7
+#
+# Title: Dockerfile for Nagios XI
+#
+# Maintainer: Yongbok Kim (ruo91@yongbok.net)
+#
+# - Build
+# docker build --rm -t nagios:xi .
+#
+# - Run
+# docker run -d --name="nagiosxi" -h "nagiosxi" -p 80:80 -p 443:443 -p 5666:5666 -p 5667:5667 nagios:xi
 
-# get stuff from the interwebs
-RUN yum -y install wget tar; yum clean all
-RUN mkdir /tmp/nagiosxi \
-    && wget -qO- https://assets.nagios.com/downloads/nagiosxi/2026/xi-2026R1.tar.gz \
-    | tar xz -C /tmp
-WORKDIR /tmp/nagiosxi
+# Base images
+FROM     centos:centos6
+MAINTAINER Yongbok Kim <ruo91@yongbok.net>
 
-# overwrite custom config file
-ADD config.cfg xi-sys.cfg
+# WorkDIR
+ENV SRC_DIR /opt
+WORKDIR $SRC_DIR
 
-# start building
-RUN ./init.sh \
-    && . ./xi-sys.cfg \
-	&& umask 0022 \
-	&& . ./functions.sh \
-	&& log="install.log"
-RUN export INTERACTIVE="False" \
-    && export INSTALL_PATH=`pwd`
-RUN . ./functions.sh \
-    && run_sub ./0-repos noupdate
-RUN . ./functions.sh \
-    && run_sub ./1-prereqs
-RUN . ./functions.sh \
-    && run_sub ./2-usersgroups
-RUN . ./functions.sh \
-    && run_sub ./3-dbservers
-RUN . ./functions.sh \
-    && run_sub ./4-services
-RUN . ./functions.sh \
-    && run_sub ./5-sudoers
-RUN sed -i.bak s/selinux/sudoers/g 9-dbbackups
-RUN . ./functions.sh \
-    && run_sub ./9-dbbackups
-RUN . ./functions.sh \
-    && run_sub ./11-sourceguardian
-RUN . ./functions.sh \
-    && run_sub ./13-phpini
+# Nagios XI
+RUN curl -LO "http://assets.nagios.com/downloads/nagiosxi/xi-latest.tar.gz" \
+ && tar xzvf xi-latest.tar.gz
 
-ADD scripts/NDOUTILS-POST subcomponents/ndoutils/post-install
-ADD scripts/install subcomponents/ndoutils/install
-RUN chmod 755 subcomponents/ndoutils/post-install \
-    && chmod 755 subcomponents/ndoutils/install \
-	&& . ./functions.sh \
-	&& run_sub ./A-subcomponents \
-	&& run_sub ./A0-mrtg
+# Disable firewall
+RUN cd nagiosxi \
+ && touch installed.firewall
 
-RUN service mysqld start \
-    && . ./functions.sh \
-	&& run_sub ./B-installxi
-RUN . ./functions.sh \
-    && run_sub ./C-cronjobs
-RUN . ./functions.sh \
-    && run_sub ./D-chkconfigalldaemons
-RUN service mysqld start \
-    && . ./functions.sh \
-	&& run_sub ./E-importnagiosql
-RUN . ./functions.sh \
-    && run_sub ./F-startdaemons
-RUN . ./functions.sh \
-    && run_sub ./Z-webroot
+# Disable kernel parameter
+ADD conf/post-install.patch $SRC_DIR/nagiosxi/post-install.patch
+RUN yum install -y patch \
+ && cd nagiosxi \
+ && patch -p0 < post-install.patch
 
-RUN yum clean all
+# Build
+RUN cd nagiosxi \
+ && ./fullinstall -n
 
+# Supervisor
+RUN yum install -y python-setuptools python-meld3 \
+ && easy_install pip \
+ && pip install --upgrade pip \
+ && pip install supervisor \
+ && mkdir /etc/supervisord.d
+ADD conf/supervisord.conf /etc/supervisord.d/supervisord.conf
+
+# Ports
+EXPOSE 80 443 5666 5667
+
+# Supervisor
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.d/supervisord.conf"]
+
+VOLUME "${NAGIOS_HOME}/var" "${NAGIOS_HOME}/etc" "/var/log/apache2" "/opt/Custom-Nagios-Plugins" "/opt/nagiosgraph/var" "/opt/nagiosgraph/etc"
+
+COPY update_hosts.sh /usr/local/bin/
+COPY update_ssh.sh /usr/local/bin/
 # set startup script
 ADD start.sh /start.sh
 RUN chmod 755 /start.sh
@@ -73,5 +63,6 @@ EXPOSE 80 5666 5667
 
 
 CMD ["/start.sh"]
+
 
 
