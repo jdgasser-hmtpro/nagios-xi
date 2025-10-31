@@ -33,7 +33,7 @@ RUN cd nagiosxi \
 # Build
 #RUN cd nagiosxi \
  #&& ./fullinstall -n
-RUN ./nagios/fullinstall -n
+RUN ./nagiosxi/fullinstall -n
 # Supervisor
 RUN yum install -y python-setuptools python-meld3 \
  && easy_install pip \
@@ -62,6 +62,7 @@ EXPOSE 80 5666 5667
 
 
 CMD ["/start.sh"]
+
 
 
 
