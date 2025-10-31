@@ -27,7 +27,7 @@ RUN cd nagiosxi \
 
 # Disable kernel parameter
 
-RUN cp -f mods/cfg/ndomod.cfg /usr/local/nagios/etc
+#RUN cp -f mods/cfg/ndomod.cfg /usr/local/nagios/etc
 
 
 # Build
@@ -62,6 +62,7 @@ EXPOSE 80 5666 5667
 
 
 CMD ["/start.sh"]
+
 
 
 
