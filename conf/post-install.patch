@@ -1,0 +1,11 @@
+ Maintainer: Yongbok Kim (ybkim@rockplace.co.kr)
+
+subcomponents/ndoutils/post-install	2016-03-24 05:26:15.162945863 +0900
+
+ cp -f mods/cfg/ndomod.cfg /usr/local/nagios/etc
+ 
+
+ 
+ 
+ # See if database already exists
+ echo "NOTE: If prompted, enter the MySQL root password"
