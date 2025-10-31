@@ -10,7 +10,7 @@
 # docker run -d --name="nagiosxi" -h "nagiosxi" -p 80:80 -p 443:443 -p 5666:5666 -p 5667:5667 nagios:xi
 
 # Base images
-FROM     centos:centos6
+FROM     centos:centos10
 MAINTAINER Yongbok Kim <ruo91@yongbok.net>
 
 # WorkDIR
@@ -62,6 +62,7 @@ EXPOSE 80 5666 5667
 
 
 CMD ["/start.sh"]
+
 
 
 
